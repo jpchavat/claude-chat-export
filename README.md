@@ -1,6 +1,18 @@
+<div align="center">
+
 # claude-chat-export
 
-Convert Claude.ai conversations to Markdown and PDF — including artifacts (interactive widgets, charts, code), web search results, and full message history.
+**Convert Claude.ai conversations to Markdown and PDF**
+
+*Artifacts, web search sources, and full message history — all in one command.*
+
+[![Python 3.13+](https://img.shields.io/badge/python-3.13+-3776ab?style=flat-square&logo=python&logoColor=white)](https://python.org)
+[![License: MIT](https://img.shields.io/badge/license-MIT-green?style=flat-square)](LICENSE)
+[![Agent Skills](https://img.shields.io/badge/agent_skills-compatible-5a67d8?style=flat-square)](https://agentskills.io)
+
+</div>
+
+---
 
 ## Example output
 
@@ -12,22 +24,28 @@ Convert Claude.ai conversations to Markdown and PDF — including artifacts (int
 
 ## Features
 
-- **URL mode**: Fetch directly from a Claude share URL — gets full conversation with artifact source code
-- **HTML mode**: Parse a saved Claude HTML page — extracts text content
-- **PDF export**: Clean, minimalistic styled PDF via `--pdf`
-- **Artifacts**: Interactive widgets, charts, and code are included as code blocks
-- **Web search sources**: Compact linked excerpts by default, or full content with `--include-sources`
+| | Feature | Description |
+|---|---|---|
+| **🔗** | **URL mode** | Fetch directly from a Claude share URL — full conversation with artifact source code |
+| **📄** | **HTML mode** | Parse a saved Claude HTML page — extracts text content |
+| **📑** | **PDF export** | Clean, minimalistic styled PDF via `--pdf` |
+| **🧩** | **Artifacts** | Interactive widgets, charts, and code included as fenced code blocks |
+| **🔍** | **Web sources** | Compact linked excerpts by default, or full content with `--include-sources` |
 
-## Installation
+## Quick start
 
 ```bash
-# Clone and install
+# Install
 git clone https://github.com/jpchavat/claude-chat-export.git
 cd claude-chat-export
 uv sync
+uv run playwright install chromium   # one-time setup
 
-# Install browser for URL mode and PDF generation (one-time)
-uv run playwright install chromium
+# Export a conversation
+uv run claude-chat-export https://claude.ai/share/<uuid>
+
+# Export with PDF
+uv run claude-chat-export https://claude.ai/share/<uuid> --pdf
 ```
 
 ## Usage
@@ -58,26 +76,45 @@ uv run claude-chat-export https://claude.ai/share/<uuid> -o notes.md
 | `--include-sources` | Include full web search source content instead of compact excerpts |
 | `--no-artifacts` | Skip artifact code extraction |
 
-## Claude Code skill
+## Agent Skill
 
-This repo includes a [Claude Code skill](https://code.claude.com/docs/en/skills) so you can use it directly from Claude Code with `/claude-chat-export`.
+<a href="https://agentskills.io"><img src="https://img.shields.io/badge/agent_skills-open_standard-5a67d8?style=for-the-badge" alt="Agent Skills" /></a>
+
+This repo includes an [Agent Skill](https://agentskills.io) — the open standard supported by **30+ AI tools**. Install it once and use `/claude-chat-export` from your favorite agent.
+
+**Compatible with:** Claude Code · Claude.ai · OpenAI Codex · Gemini CLI · Cursor · VS Code / GitHub Copilot · Roo Code · Goose · Junie (JetBrains) · [and more](https://agentskills.io/home)
 
 ### Install the skill
 
-Copy the skill directory to your personal skills folder:
+Each tool has its own skills directory. Copy the skill folder to the right location:
+
+| Tool | Skills path |
+|------|-------------|
+| **Claude Code** | `~/.claude/skills/` |
+| **OpenAI Codex** | `~/.codex/skills/` |
+| **Gemini CLI** | `~/.gemini/skills/` |
+| **Cursor** | `.cursor/skills/` (project) |
+| **VS Code / Copilot** | `.github/skills/` (project) |
+| **Any project** | `.claude/skills/` or `.agent/skills/` (committed to repo) |
 
 ```bash
-# One-liner
+# Claude Code (personal — available in all projects)
 mkdir -p ~/.claude/skills && cp -r .claude/skills/claude-chat-export ~/.claude/skills/
 
-# Or if you haven't cloned the repo:
+# OpenAI Codex
+mkdir -p ~/.codex/skills && cp -r .claude/skills/claude-chat-export ~/.codex/skills/
+
+# Gemini CLI
+mkdir -p ~/.gemini/skills && cp -r .claude/skills/claude-chat-export ~/.gemini/skills/
+
+# Or one-liner without cloning the repo (Claude Code example):
 git clone https://github.com/jpchavat/claude-chat-export.git /tmp/cce \
   && mkdir -p ~/.claude/skills \
   && cp -r /tmp/cce/.claude/skills/claude-chat-export ~/.claude/skills/ \
   && rm -rf /tmp/cce
 ```
 
-Then in any Claude Code session you can run:
+Then invoke it from your agent:
 
 ```
 /claude-chat-export https://claude.ai/share/<uuid> --pdf
@@ -85,9 +122,11 @@ Then in any Claude Code session you can run:
 
 ## How it works
 
-- **URL mode**: Uses Playwright to load the share page and intercepts the `chat_snapshots` API response, which contains the full conversation data including artifact widget code.
-- **HTML mode**: Parses the saved HTML with BeautifulSoup to extract rendered messages. Artifact source code is not available in static HTML exports (the code is delivered via postMessage at runtime).
-- **PDF rendering**: Converts Markdown to styled HTML with a clean, minimalistic CSS theme, then uses Chromium's built-in PDF printing via Playwright.
+| Mode | Approach |
+|------|----------|
+| **URL** | Uses Playwright to load the share page and intercepts the `chat_snapshots` API response, which contains the full conversation data including artifact widget code |
+| **HTML** | Parses the saved HTML with BeautifulSoup to extract rendered messages. Artifact source code is not available in static exports (delivered via postMessage at runtime) |
+| **PDF** | Converts Markdown to styled HTML with a clean, minimalistic CSS theme, then uses Chromium's built-in PDF printing via Playwright |
 
 ## License
 
