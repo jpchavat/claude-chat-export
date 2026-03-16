@@ -23,13 +23,14 @@ def _is_url(s: str) -> bool:
     return s.startswith("http://") or s.startswith("https://")
 
 
-def _output_path(source: str, output: Path | None) -> Path:
+def _output_path(source: str, output: Path | None, pdf: bool = False) -> Path:
+    ext = ".pdf" if pdf else ".md"
     if output:
         return output
     if _is_url(source):
         uuid = extract_uuid(source) or "conversation"
-        return Path(f"{uuid}.md")
-    return Path(source).with_suffix(".md")
+        return Path(f"{uuid}{ext}")
+    return Path(source).with_suffix(ext)
 
 
 @click.command()
@@ -52,7 +53,13 @@ def _output_path(source: str, output: Path | None) -> Path:
     default=False,
     help="Include full web search source content (default: compact links with excerpts).",
 )
-def main(source: str, output: Path | None, no_artifacts: bool, include_sources: bool) -> None:
+@click.option(
+    "--pdf",
+    is_flag=True,
+    default=False,
+    help="Also generate a styled PDF alongside the Markdown output.",
+)
+def main(source: str, output: Path | None, no_artifacts: bool, include_sources: bool, pdf: bool) -> None:
     """Convert a Claude conversation to Markdown.
 
     SOURCE can be:
@@ -74,7 +81,7 @@ def main(source: str, output: Path | None, no_artifacts: bool, include_sources: 
       claude-chat-export conversation.html
       claude-chat-export conversation.html -o notes.md
     """
-    out_path = _output_path(source, output)
+    out_path = _output_path(source, output, pdf=pdf)
 
     if _is_url(source):
         # ── URL mode: fetch via API ────────────────────────────────────────
@@ -142,6 +149,13 @@ def main(source: str, output: Path | None, no_artifacts: bool, include_sources: 
         md = from_html_conversation(conv)
 
     # ── Write output ───────────────────────────────────────────────────────
-    out_path.write_text(md, encoding="utf-8")
-    console.print(f"\n[bold green]✓ Written:[/bold green] {out_path}")
+    md_path = out_path.with_suffix(".md") if pdf else out_path
+    md_path.write_text(md, encoding="utf-8")
+    console.print(f"\n[bold green]✓ Markdown:[/bold green] {md_path}")
     console.print(f"  {len(md.splitlines())} lines / {len(md):,} chars")
+
+    if pdf:
+        pdf_path = out_path.with_suffix(".pdf")
+        from .pdf_renderer import render_pdf
+        render_pdf(md, pdf_path)
+        console.print(f"[bold green]✓ PDF:[/bold green]      {pdf_path}")

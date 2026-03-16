@@ -12,6 +12,7 @@ dependencies = [
     "playwright>=1.44",
     "aiofiles>=23.2",
     "rich>=13.7",
+    "markdown>=3.6",
 ]
 
 [project.scripts]
