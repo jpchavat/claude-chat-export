@@ -58,6 +58,31 @@ uv run claude-chat-export https://claude.ai/share/<uuid> -o notes.md
 | `--include-sources` | Include full web search source content instead of compact excerpts |
 | `--no-artifacts` | Skip artifact code extraction |
 
+## Claude Code skill
+
+This repo includes a [Claude Code skill](https://code.claude.com/docs/en/skills) so you can use it directly from Claude Code with `/claude-chat-export`.
+
+### Install the skill
+
+Copy the skill directory to your personal skills folder:
+
+```bash
+# One-liner
+mkdir -p ~/.claude/skills && cp -r .claude/skills/claude-chat-export ~/.claude/skills/
+
+# Or if you haven't cloned the repo:
+git clone https://github.com/jpchavat/claude-chat-export.git /tmp/cce \
+  && mkdir -p ~/.claude/skills \
+  && cp -r /tmp/cce/.claude/skills/claude-chat-export ~/.claude/skills/ \
+  && rm -rf /tmp/cce
+```
+
+Then in any Claude Code session you can run:
+
+```
+/claude-chat-export https://claude.ai/share/<uuid> --pdf
+```
+
 ## How it works
 
 - **URL mode**: Uses Playwright to load the share page and intercepts the `chat_snapshots` API response, which contains the full conversation data including artifact widget code.
