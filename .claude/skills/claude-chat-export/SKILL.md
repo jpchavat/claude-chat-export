@@ -1,6 +1,11 @@
 ---
 name: claude-chat-export
 description: "Use this skill whenever the user wants to export, download, save, or convert a Claude.ai conversation to Markdown or PDF. Triggers include: any mention of 'export chat', 'save conversation', 'download chat', 'convert to markdown', 'convert to PDF', Claude share URLs (claude.ai/share/...), or requests to extract artifacts, code, or web search results from a Claude conversation. Also use when the user provides a saved Claude HTML file and wants it converted. Do NOT use for general markdown conversion or non-Claude content."
+license: MIT
+compatibility: Requires uv (or pip) and Playwright with Chromium installed. Works on macOS, Linux, and Windows.
+metadata:
+  author: jpchavat
+  version: "0.1.0"
 ---
 
 # Claude Chat Export
